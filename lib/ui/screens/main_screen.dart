@@ -33,9 +33,11 @@ class _MainScreenState extends State<MainScreen> {
               padding: const EdgeInsets.all(8.0),
               child: CupertinoSearchTextField(
                 placeholder: "Ara",
-                onChanged: (searchText) {
+                onChanged: (searchText) async {
                   if (searchText.isEmpty) {
-                    context.read<MainCubit>().loadItems();
+                    await context
+                        .read<MainCubit>()
+                        .loadItems(); // ← bekle ki emit tamamlasın
                   } else {
                     context.read<MainCubit>().search(searchText);
                   }
