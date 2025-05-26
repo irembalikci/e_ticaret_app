@@ -19,6 +19,8 @@ class AppDaoRepository {
     }
   }
 
+  List<Items> _cachedItems = [];
+
   Future<void> ordered(
     String ad,
     String resim,
@@ -66,17 +68,20 @@ class AppDaoRepository {
     return parseItems(response.data.toString());
   }
 
-  Future<List<Items>> search(String searchText) async {
-    var url = "http://kasimadalan.pe.hu/urunler/tumUrunleriGetir.php";
-    var data = {"ad": searchText};
-    var response = await Dio().post(url, data: FormData.fromMap(data));
-    return parseItems(response.toString());
-  }
-
   Future<void> delete(String kullaniciAdi, int sepetId) async {
     var url = "http://kasimadalan.pe.hu/urunler/sepettenUrunSil.php";
     var data = {"sepetId": sepetId, "kullaniciAdi": kullaniciAdi};
     var response = await Dio().post(url, data: FormData.fromMap(data));
     print("DELETE: ${response.data.toString()}");
+  }
+
+  Future<List<Items>> search(String searchText) async {
+    var items = await loadItems(); // ← senin var olan çağrın
+    _cachedItems = items;
+    return _cachedItems
+        .where(
+          (item) => item.ad.toLowerCase().contains(searchText.toLowerCase()),
+        )
+        .toList();
   }
 }
